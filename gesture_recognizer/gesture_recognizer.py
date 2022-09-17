@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import pandas as pd
 import mediapipe as mp
-from utils import draw_landmarks, calculate_landmarks
+from gesture_recognizer.utils import draw_landmarks, calculate_landmarks
 import time
 import itertools
 import copy
@@ -19,7 +19,7 @@ def get_landmarks(image, keypoints):
 def preprocess_landmarks(landmark_list):
     temp_landmark_list = copy.deepcopy(landmark_list)
 
-    base_x, base_y = 0, 0
+    base_x, base_y, base_z = 0, 0, 0
     for index, landmark_point in enumerate(temp_landmark_list):
         if index == 0:
             base_x, base_y, base_z = landmark_point[0], landmark_point[1], landmark_point[2]
@@ -44,7 +44,7 @@ poses = ['HOLD', 'GRAB', 'FIST', 'INDEX', 'PEACE', 'OK']
 
 class GestureRecognizer:
     def __init__(self, model=None) -> None:
-        self.model =  torch.jit.load('gesture_recognizer.pt') if model is None else model
+        self.model =  torch.jit.load('./gesture_recognizer/gesture_recognizer.pt') if model is None else model
         mp_hands_sol = mp.solutions.hands
         self.mp_hands = mp_hands_sol.Hands(
             max_num_hands=1,
@@ -56,11 +56,12 @@ class GestureRecognizer:
         hand_kpts = self.mp_hands.process(image)
         landmarks = get_landmarks(image, hand_kpts)
         if len(landmarks) == 0:
-            return 'none'
+            return 'none', []
         image = draw_landmarks(image, landmarks)
+        raw_landmarks = landmarks.copy()
         landmarks = preprocess_landmarks(landmarks)
         landmarks.append(0)
         landmarks = np.array(landmarks)
         landmarks = torch.from_numpy(landmarks)
         res = self.model(landmarks).detach().numpy()
-        return poses[np.argmax(res)]
+        return poses[np.argmax(res)], raw_landmarks

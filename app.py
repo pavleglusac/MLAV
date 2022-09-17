@@ -1,3 +1,4 @@
+from re import I
 import cv2
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtGui import QPixmap, QImage
@@ -8,12 +9,16 @@ from ui.mlav import Ui_MainWindow
 from ui.utils import Camera
 from gesture_recognizer.gesture_recognizer import GestureRecognizer
 import torch
+from message_handlers import MessageHandler, DroneMessageHandler, Message
+from ui.loggers import QtLogger
 
 
 class Window(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+        self.logger = QtLogger(self.textBrowser)
+        self.communicator = DroneMessageHandler(self.logger)
         self.camera = Camera(0)
         self.timer = QTimer()
         self.timer.timeout.connect(self.nextFrameSlot)
@@ -25,7 +30,9 @@ class Window(QMainWindow, Ui_MainWindow):
 
     def nextFrameSlot(self):
         rval, frame = self.camera.vc.read()
-        pose = gesture_recognizer.classify_pose(frame)
+        pose, keypoints = gesture_recognizer.classify_pose(frame)
+        msg = Message(keypoints, pose)
+        self.communicator.process_message(msg)
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         image = QImage(frame, frame.shape[1], frame.shape[0], QImage.Format_RGB888)
         pixmap = QPixmap.fromImage(image)

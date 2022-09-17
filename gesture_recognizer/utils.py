@@ -17,8 +17,12 @@ def calculate_landmarks(image, landmarks):
 
 def draw_landmarks(image, landmarks):
     if len(landmarks) > 0:
-        # Thumb
+
         landmarks = [(x[0], x[1]) for x in landmarks]
+
+        cv.line(image, tuple(landmarks[0]), tuple(landmarks[9]), (0, 0, 200), 6)
+
+        # Thumb
 
 
         cv.line(image, tuple(landmarks[2]), tuple(landmarks[3]),
