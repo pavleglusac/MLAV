@@ -44,7 +44,7 @@ poses = ['HOLD', 'GRAB', 'FIST', 'INDEX', 'PEACE', 'OK']
 
 class GestureRecognizer:
     def __init__(self, model=None) -> None:
-        self.model =  torch.jit.load('./gesture_recognizer/gesture_recognizer.pt') if model is None else model
+        self.model = torch.jit.load('./gesture_recognizer/gesture_recognizer.pt') if model is None else model
         mp_hands_sol = mp.solutions.hands
         self.mp_hands = mp_hands_sol.Hands(
             max_num_hands=1,

@@ -9,7 +9,7 @@ from ui.mlav import Ui_MainWindow
 from ui.utils import Camera
 from gesture_recognizer.gesture_recognizer import GestureRecognizer
 import torch
-from message_handlers import MessageHandler, DroneMessageHandler, Message
+from message_handlers import MessageHandler, DroneMessageHandler, LogMessageHandler, Message
 from ui.loggers import QtLogger
 
 
@@ -18,7 +18,7 @@ class Window(QMainWindow, Ui_MainWindow):
         super().__init__(parent)
         self.setupUi(self)
         self.logger = QtLogger(self.textBrowser)
-        self.communicator = DroneMessageHandler(self.logger)
+        self.communicator = LogMessageHandler(self.logger)
         self.camera = Camera(0)
         self.timer = QTimer()
         self.timer.timeout.connect(self.nextFrameSlot)
