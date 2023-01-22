@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod
 from pynput.keyboard import Key, Controller
 import time
 import numpy as np
+import os
+import signal
 
 
 def create_message():
@@ -21,6 +23,7 @@ keyboard = Controller()
 class CommandExecutor:
 	def __init__(self, logger):
 		self.logger = logger
+
 	def execute_forward(self):
 		msg = "GOING FORWARD!!!"
 		self.logger.log(msg)
@@ -62,6 +65,7 @@ class CommandExecutor:
 		keyboard.press(Key.down)
 		time.sleep(press_dur)
 		keyboard.release(Key.down)
+
 
 class MessageHandler(ABC):
 	def __init__(self, logger) -> None:
@@ -156,7 +160,6 @@ class DroneMessageHandler(MessageHandler, CommandExecutor):
 		self.base_point = (None, None)
 		self.base_pitch = None
 
-
 	def execute_grab(self):
 		msg = "GETTING COORDINATES AND FLYING . . ."
 		self.logger.log(msg)
@@ -204,6 +207,7 @@ class LogMessageHandler(MessageHandler, CommandExecutor):
 			'INDEX': (self.execute_index, 30),
 			'HOLD': (self.execute_hold, 30)
 		}
+		self.vmm = None
 
 	def reset_bases(self):
 		self.base_point = (None, None)
@@ -235,6 +239,10 @@ class LogMessageHandler(MessageHandler, CommandExecutor):
 		msg = "LANDING IN PROGRESS . . ."
 		self.logger.log(msg)
 		self.execute_down()
+		if not self.vmm:
+			vmh = VoiceMessageHandler()
+			vmh.process_message('up')
+			self.vmm = 'aaa'
 
 	def execute_index(self):
 		msg = "INCREASING ALTITUDE . . ."
@@ -249,12 +257,10 @@ class LogMessageHandler(MessageHandler, CommandExecutor):
 
 class VoiceMessageHandler:
 	def __init__(self):
-		self.state_action = {
-			'up': self.execute_up,
-			'down': self.execute_down
-		}
 		self.last_proc = None
+
 	def process_message(self, command):
 		if self.last_proc is not None:
 			self.last_proc.kill()
-		self.last_proc = subprocess.Popen(["python3", "subexec.py", "--comand", "=", command])
+		if command != 'stop' or command != 'off':
+			self.last_proc = subprocess.Popen(["C:/Python3.8/python.exe", "subexec.py", command])
