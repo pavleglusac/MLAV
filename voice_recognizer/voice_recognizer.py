@@ -27,7 +27,7 @@ def index_to_label(index):
 	return labels[index]
 
 def predict(tensor, model, transform):
-	tensor = tensor.to(device)
+	# tensor = tensor.to(device)
 	tensor = transform(tensor)
 	tensor = model(tensor.unsqueeze(0))
 	tensor = get_likely_index(tensor)
@@ -42,8 +42,9 @@ def load_waveform(path: str, exp_sample_rate: int):
 
 class VoiceRecognizer:
 	def __init__(self):
-		self.model = torch.jit.load("voice_recognizer.pt")
+		self.model = torch.jit.load("voice_recognizer/voice_recognizer.pt")
 		self.model.eval()
+		# self.model = self.model.to(device)
 		self.transform = torchaudio.transforms.Resample(orig_freq=16_000, new_freq=8_000)
 
 	def record_and_predict(self):

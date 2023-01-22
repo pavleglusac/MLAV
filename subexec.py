@@ -1,41 +1,23 @@
-from pynput.keyboard import Key, Controller
+import threading
 
+from pynput.keyboard import Key, Controller
+import datetime
+import time
 keyboard: Controller = Controller()
 
 
-def execute_forward():
-	msg = "GOING FORWARD!!!"
-	print(msg)
-	keyboard.press('w')
+
+def execute_key(key):
+	tiemstamp = datetime.datetime.now()
+	wait = 20
+	while True:
+		keyboard.press(key)
+		time.sleep(0.2)
+		keyboard.release(key)
+		if (datetime.datetime.now() - tiemstamp).total_seconds() > wait:
+			break
 
 
-def execute_backward():
-	msg = "GOING BACKWARD!!!"
-	print(msg)
-	keyboard.press('s')
-
-
-def execute_left():
-	msg = "GOING LEFT!!!"
-	print(msg)
-	keyboard.press(Key.left)
-
-
-def execute_right():
-	msg = "GOING RIGHT!!!"
-	print(msg)
-	keyboard.press(Key.right)
-
-def execute_up():
-	msg = "GOING UP!!!"
-	print(msg)
-	keyboard.press(Key.up)
-
-
-def execute_down():
-	msg = "GOING DOWN!!!"
-	print(msg)
-	keyboard.press(Key.down)
 
 
 import sys
@@ -44,12 +26,12 @@ print(sys.argv)
 command = sys.argv[1]
 
 command_fun = {
-	'up': execute_up,
-	'down': execute_down,
-	'right': execute_right,
-	'left': execute_left,
-	'forward': execute_forward,
-	'backward': execute_backward
+	'up': Key.up,
+	'down': Key.down,
+	'right': Key.right,
+	'left': Key.left,
+	'forward': 'w',
+	'backward': 's'
 }
 
-command_fun[command]()
+execute_key(command_fun[command])

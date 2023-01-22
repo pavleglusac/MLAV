@@ -45,11 +45,15 @@ class Window(QMainWindow, Ui_MainWindow):
 
     def recButtonClicked(self):
         print("rec button clicked")
-        self.voice_communicator.process_message('up')
+        self.logger.log("RECORDING")
+        msg = voice_recognizer.record_and_predict()
+        self.logger.log(msg)
+        self.voice_communicator.process_message(msg)
 
 
 if __name__ == '__main__':
     gesture_recognizer = GestureRecognizer()
+    voice_recognizer = VoiceRecognizer()
     app = QApplication([])
     start_window = Window()
     start_window.show()

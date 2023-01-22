@@ -155,6 +155,7 @@ class DroneMessageHandler(MessageHandler, CommandExecutor):
 			'INDEX': (self.execute_index, 30),
 			'HOLD': (self.execute_hold, 30)
 		}
+		self.vmm = None
 
 	def reset_bases(self):
 		self.base_point = (None, None)
@@ -186,6 +187,7 @@ class DroneMessageHandler(MessageHandler, CommandExecutor):
 		msg = "LANDING IN PROGRESS . . ."
 		self.logger.log(msg)
 		self.execute_down()
+
 
 	def execute_index(self):
 		msg = "INCREASING ALTITUDE . . ."
@@ -239,10 +241,7 @@ class LogMessageHandler(MessageHandler, CommandExecutor):
 		msg = "LANDING IN PROGRESS . . ."
 		self.logger.log(msg)
 		self.execute_down()
-		if not self.vmm:
-			vmh = VoiceMessageHandler()
-			vmh.process_message('up')
-			self.vmm = 'aaa'
+
 
 	def execute_index(self):
 		msg = "INCREASING ALTITUDE . . ."
@@ -263,4 +262,4 @@ class VoiceMessageHandler:
 		if self.last_proc is not None:
 			self.last_proc.kill()
 		if command != 'stop' or command != 'off':
-			self.last_proc = subprocess.Popen(["C:/Python3.8/python.exe", "subexec.py", command])
+			self.last_proc = subprocess.Popen(["python3", "subexec.py", command])
