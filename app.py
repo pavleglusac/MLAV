@@ -17,6 +17,7 @@ class Window(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+        self.recButton.clicked.connect(self.recButtonClicked)
         self.logger = QtLogger(self.textBrowser)
         self.communicator = DroneMessageHandler(self.logger)
         self.camera = Camera(0)
@@ -39,6 +40,8 @@ class Window(QMainWindow, Ui_MainWindow):
         self.imgLabel.setPixmap(pixmap)
         self.textBrowser.append(f"<p style='color: red'>CLASSIFIED {pose}</p>")
 
+    def recButtonClicked(self):
+        print("rec button clicked")
 
 if __name__ == '__main__':
     gesture_recognizer = GestureRecognizer()
