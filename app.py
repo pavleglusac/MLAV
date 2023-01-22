@@ -8,9 +8,11 @@ from PyQt5.QtWidgets import QLabel, QWidget, QPushButton, QVBoxLayout, QApplicat
 from ui.mlav import Ui_MainWindow
 from ui.utils import Camera
 from gesture_recognizer.gesture_recognizer import GestureRecognizer
+from voice_recognizer.voice_recognizer import VoiceRecognizer
 import torch
-from message_handlers import MessageHandler, DroneMessageHandler, LogMessageHandler, Message
+from message_handlers import MessageHandler, DroneMessageHandler, LogMessageHandler, Message, VoiceMessageHandler
 from ui.loggers import QtLogger
+
 
 
 class Window(QMainWindow, Ui_MainWindow):
@@ -20,6 +22,7 @@ class Window(QMainWindow, Ui_MainWindow):
         self.recButton.clicked.connect(self.recButtonClicked)
         self.logger = QtLogger(self.textBrowser)
         self.communicator = DroneMessageHandler(self.logger)
+        self.voice_communicator = VoiceMessageHandler()
         self.camera = Camera(0)
         self.timer = QTimer()
         self.timer.timeout.connect(self.nextFrameSlot)
@@ -42,6 +45,8 @@ class Window(QMainWindow, Ui_MainWindow):
 
     def recButtonClicked(self):
         print("rec button clicked")
+        self.voice_communicator.process_message('up')
+
 
 if __name__ == '__main__':
     gesture_recognizer = GestureRecognizer()

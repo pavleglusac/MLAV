@@ -1,3 +1,4 @@
+import subprocess
 from abc import ABC, abstractmethod
 from pynput.keyboard import Key, Controller
 import time
@@ -16,6 +17,51 @@ class Message:
 
 keyboard = Controller()
 
+
+class CommandExecutor:
+	def __init__(self, logger):
+		self.logger = logger
+	def execute_forward(self):
+		msg = "GOING FORWARD!!!"
+		self.logger.log(msg)
+		keyboard.press('w')
+		time.sleep(press_dur)
+		keyboard.release('w')
+
+	def execute_backward(self):
+		msg = "GOING BACKWARD!!!"
+		self.logger.log(msg)
+		keyboard.press('s')
+		time.sleep(press_dur)
+		keyboard.release('s')
+
+	def execute_left(self):
+		msg = "GOING LEFT!!!"
+		self.logger.log(msg)
+		keyboard.press(Key.left)
+		time.sleep(press_dur)
+		keyboard.release(Key.left)
+
+	def execute_right(self):
+		msg = "GOING RIGHT!!!"
+		self.logger.log(msg)
+		keyboard.press(Key.right)
+		time.sleep(press_dur)
+		keyboard.release(Key.right)
+
+	def execute_up(self):
+		msg = "GOING UP!!!"
+		self.logger.log(msg)
+		keyboard.press(Key.up)
+		time.sleep(press_dur)
+		keyboard.release(Key.up)
+
+	def execute_down(self):
+		msg = "GOING DOWN!!!"
+		self.logger.log(msg)
+		keyboard.press(Key.down)
+		time.sleep(press_dur)
+		keyboard.release(Key.down)
 
 class MessageHandler(ABC):
 	def __init__(self, logger) -> None:
@@ -96,7 +142,7 @@ def calculate_base_point(message):
 press_dur = 0.05
 
 
-class DroneMessageHandler(MessageHandler):
+class DroneMessageHandler(MessageHandler, CommandExecutor):
 	def __init__(self, logger) -> None:
 		super().__init__(logger=logger)
 		self.state_action = {
@@ -110,47 +156,6 @@ class DroneMessageHandler(MessageHandler):
 		self.base_point = (None, None)
 		self.base_pitch = None
 
-	def execute_forward(self):
-		msg = "GOING FORWARD!!!"
-		self.logger.log(msg)
-		keyboard.press('w')
-		time.sleep(press_dur)
-		keyboard.release('w')
-
-	def execute_backward(self):
-		msg = "GOING BACKWARD!!!"
-		self.logger.log(msg)
-		keyboard.press('s')
-		time.sleep(press_dur)
-		keyboard.release('s')
-
-	def execute_left(self):
-		msg = "GOING LEFT!!!"
-		self.logger.log(msg)
-		keyboard.press(Key.left)
-		time.sleep(press_dur)
-		keyboard.release(Key.left)
-
-	def execute_right(self):
-		msg = "GOING RIGHT!!!"
-		self.logger.log(msg)
-		keyboard.press(Key.right)
-		time.sleep(press_dur)
-		keyboard.release(Key.right)
-
-	def execute_up(self):
-		msg = "GOING UP!!!"
-		self.logger.log(msg)
-		keyboard.press(Key.up)
-		time.sleep(press_dur)
-		keyboard.release(Key.up)
-
-	def execute_down(self):
-		msg = "GOING DOWN!!!"
-		self.logger.log(msg)
-		keyboard.press(Key.down)
-		time.sleep(press_dur)
-		keyboard.release(Key.down)
 
 	def execute_grab(self):
 		msg = "GETTING COORDINATES AND FLYING . . ."
@@ -190,7 +195,7 @@ class DroneMessageHandler(MessageHandler):
 		self.reset_bases()
 
 
-class LogMessageHandler(MessageHandler):
+class LogMessageHandler(MessageHandler, CommandExecutor):
 	def __init__(self, logger) -> None:
 		super().__init__(logger=logger)
 		self.state_action = {
@@ -203,30 +208,6 @@ class LogMessageHandler(MessageHandler):
 	def reset_bases(self):
 		self.base_point = (None, None)
 		self.base_pitch = None
-
-	def execute_forward(self):
-		msg = "GOING FORWARD!!!"
-		self.logger.log(msg)
-
-	def execute_backward(self):
-		msg = "GOING BACKWARD!!!"
-		self.logger.log(msg)
-
-	def execute_left(self):
-		msg = "GOING LEFT!!!"
-		self.logger.log(msg)
-
-	def execute_right(self):
-		msg = "GOING RIGHT!!!"
-		self.logger.log(msg)
-
-	def execute_up(self):
-		msg = "GOING UP!!!"
-		self.logger.log(msg)
-
-	def execute_down(self):
-		msg = "GOING DOWN!!!"
-		self.logger.log(msg)
 
 	def execute_grab(self):
 		msg = "GETTING COORDINATES AND FLYING . . ."
@@ -264,3 +245,16 @@ class LogMessageHandler(MessageHandler):
 		msg = "HOLDING . . ."
 		self.logger.log(msg)
 		self.reset_bases()
+
+
+class VoiceMessageHandler:
+	def __init__(self):
+		self.state_action = {
+			'up': self.execute_up,
+			'down': self.execute_down
+		}
+		self.last_proc = None
+	def process_message(self, command):
+		if self.last_proc is not None:
+			self.last_proc.kill()
+		self.last_proc = subprocess.Popen(["python3", "subexec.py", "--comand", "=", command])

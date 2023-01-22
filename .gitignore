@@ -162,3 +162,9 @@ cython_debug/
 *.gz
 
 *.wav
+
+*.ckpt
+
+*.pop-os
+
+*.yaml
