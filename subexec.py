@@ -1,18 +1,20 @@
 import threading
 
 from pynput.keyboard import Key, Controller
+from pynput.mouse import Controller as MouseController
 import datetime
 import time
 keyboard: Controller = Controller()
-
-
+mouse: MouseController = MouseController()
 
 def execute_key(key):
 	tiemstamp = datetime.datetime.now()
-	wait = 20
+	wait = 5
+	mouse.position = (500, 500)
+	mouse.click()
 	while True:
 		keyboard.press(key)
-		time.sleep(0.2)
+		time.sleep(0.1)
 		keyboard.release(key)
 		if (datetime.datetime.now() - tiemstamp).total_seconds() > wait:
 			break
